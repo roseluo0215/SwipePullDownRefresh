@@ -25,9 +25,9 @@ import android.widget.ListView;
  */
 
 public class SwipePullDownRefresh extends SwipeRefreshLayout
-        implements
-        AbsListView.OnScrollListener,
-        SwipeRefreshLayout.OnRefreshListener {
+    implements
+      AbsListView.OnScrollListener,
+      SwipeRefreshLayout.OnRefreshListener {
 
   public static final int PULL_DOWN_TO_REFRESH_MODE = 0;// 下拉模式
 
@@ -35,7 +35,7 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
 
   public static final int BOTH_MODE = 2;// 两者都可以
 
-  public static final int DISABLED_MODE = 4;//禁止上拉下拉模式
+  public static final int DISABLED_MODE = 4;// 禁止上拉下拉模式
 
   private int mCurrentMode = 2;// 默认是可以上拉和下拉
 
@@ -76,7 +76,7 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
    */
   private boolean mIsAdd = false;
 
-//  private int mItemNead
+  private int mItemCountHaveLoad = 10;// 该字段表示item小于10得话就不需要显示加载更多得footerview，大于10个item上拉得时候就去显示加载更多得view
 
   public SwipePullDownRefresh(@NonNull Context context) {
     super(context);
@@ -90,15 +90,15 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
     mListView.setOnScrollListener(this);// ListView的滚动事件的注册
     // inflate一个footerView
     mListViewFooter = LayoutInflater.from(context).inflate(
-            R.layout.swipe_pull_down_refresh_footer_view, null, false);
+        R.layout.swipe_pull_down_refresh_footer_view, null, false);
     addView(mListView);
   }
 
-  public void setListViewDivider(Drawable drawable){
+  public void setListViewDivider(Drawable drawable) {
     mListView.setDivider(drawable);
   }
 
-  //如果不需要上拉或下拉效果可以通过这个方法设置
+  // 如果不需要上拉或下拉效果可以通过这个方法设置
   public void setMode(int mode) {
     mCurrentMode = mode;
     if (mode == PULL_UP_TO_REFRESH_MODE || mode == DISABLED_MODE) {// 禁止下拉模式
@@ -110,7 +110,7 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
    * 用于判断是否可以上拉。
    */
   private boolean isCanPullUp() {
-    return mCurrentMode == PULL_UP_TO_REFRESH_MODE || mCurrentMode ==BOTH_MODE;
+    return mCurrentMode == PULL_UP_TO_REFRESH_MODE || mCurrentMode == BOTH_MODE;
   }
 
   /**
@@ -149,7 +149,7 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
    */
   private boolean isBottom() {
     return mListView.getAdapter() != null
-            && mListView.getLastVisiblePosition() == mListView.getAdapter().getCount() - 1;
+        && mListView.getLastVisiblePosition() == mListView.getAdapter().getCount() - 1;
   }
 
   /**
@@ -163,16 +163,15 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
 
 
   @Override
-  public void onScrollStateChanged(AbsListView view, int scrollState) {
-  }
+  public void onScrollStateChanged(AbsListView view, int scrollState) {}
 
   /**
    * listView滚动事件
    */
   @Override
   public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount,
-                       int totalItemCount) {
-    if (!isCanPullUp()) {//禁止下拉模式
+      int totalItemCount) {
+    if (!isCanPullUp()) {// 禁止下拉模式
       return;
     }
     // 滚动时到了最底部加载更多
@@ -182,11 +181,18 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
   }
 
   /**
+   * 设置listview中有几个item以上上拉得时候就显示加载更多得view
+   * */
+  public void setItemCountHaveLoad(int itemCountHaveLoad) {
+    mItemCountHaveLoad = itemCountHaveLoad;
+  }
+
+  /**
    * listView触摸拦截事件。
    */
   @Override
   public boolean dispatchTouchEvent(MotionEvent ev) {
-    if (!isCanPullUp()) {//禁止下拉模式
+    if (!isCanPullUp()) {// 禁止下拉模式
       return super.dispatchTouchEvent(ev);
     }
     final int action = ev.getAction();
@@ -199,7 +205,7 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
       case MotionEvent.ACTION_MOVE:
         mYLast = (int) ev.getRawY();
         if (isCanLoad() && !mIsAdd) {
-          if (mListView.getCount() >= 10) {
+          if (mListView.getCount() >= mItemCountHaveLoad) {
             addFooterView();
 
           }
@@ -210,7 +216,7 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
         mIsActionUp = true;
         mYLast = (int) ev.getRawY();
         if (isCanLoad()) {
-          if (mListView.getCount() >=10) {
+          if (mListView.getCount() >= mItemCountHaveLoad) {
             loadDownData();
           }
         }

@@ -117,6 +117,7 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
    * set ListView的Adapter
    */
   public void setAdapter(ListAdapter adapter) {
+    addFooterView();//在此处addfooterview，如果不在setadapter之前设置footerview在android5.0以下会出现 cannot be cast to android.widget.HeaderViewListAdapter
     mListView.setAdapter(adapter);
   }
 

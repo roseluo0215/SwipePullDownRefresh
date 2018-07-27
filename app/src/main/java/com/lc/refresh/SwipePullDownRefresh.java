@@ -119,6 +119,7 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
   public void setAdapter(ListAdapter adapter) {
     addFooterView();//在此处addfooterview，如果不在setadapter之前设置footerview在android5.0以下会出现 cannot be cast to android.widget.HeaderViewListAdapter
     mListView.setAdapter(adapter);
+    removeFooterView();
   }
 
   /**
@@ -232,6 +233,11 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
     mListView.addFooterView(mListViewFooter);
   }
 
+  private void removeFooterView(){
+    mIsAdd = false;
+    mListView.removeFooterView(mListViewFooter);
+  }
+
   @Override
   public void onRefresh() {
     if (mOnRefreshListener != null) {// 监听到下拉动作时调用接口方法
@@ -261,8 +267,7 @@ public class SwipePullDownRefresh extends SwipeRefreshLayout
       mListView.setSelection(mListView.getAdapter().getCount() - 1);
     } else {
       if (mIsAdd) {
-        mIsAdd = false;
-        mListView.removeFooterView(mListViewFooter);
+        removeFooterView();
       }
       mYLast = 0;
       mYDown = 0;
